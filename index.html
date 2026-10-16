@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>IANO寶可夢對戰紀錄</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"PingFang TC","Noto Sans TC",sans-serif;background:#f1f3f6;color:#222;height:100vh;height:100dvh;display:flex;flex-direction:column}
+header{padding:6px 10px;background:#1f2937;color:#fff}.hr{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:2px 0}.sp{flex:1}.prize.me{border-left:5px solid #2563eb}.prize.op{border-left:5px solid #dc2626}.prize b{min-width:22px;text-align:center}
+.g button.used{background:#d1d5db;color:#555;text-decoration:line-through}
+header .grp{display:flex;gap:6px;align-items:center}
+button{font:inherit;border:0;border-radius:10px;min-height:52px;padding:6px 10px;cursor:pointer;font-size:17px;touch-action:manipulation}
+button:active{transform:scale(.96)}
+.tog button{background:#4b5563;color:#fff;min-width:72px}
+@media (max-width:1100px){header button{font-size:16px;padding:6px 8px}.turn{min-width:76px;font-size:18px}}
+.tog button.on.me{background:#2563eb}.tog button.on.op{background:#dc2626}
+.turn{font-size:20px;font-weight:700;min-width:90px;text-align:center}
+.prize{background:#374151;border-radius:10px;padding:4px 10px;display:flex;gap:6px;align-items:center}
+.prize b{font-size:22px}.prize button{min-height:40px;min-width:40px;background:#6b7280;color:#fff}
+main{flex:1;display:flex;min-height:0}
+#acts{flex:1.6;overflow:auto;padding:10px}
+.sec h3{margin:8px 2px 6px;font-size:14px;color:#555}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.g button{background:#fff;box-shadow:0 1px 3px #0002;min-height:64px}
+.c1 button{border-left:6px solid #10b981}.c2 button{border-left:6px solid #f59e0b}.c3 button{border-left:6px solid #ef4444}.c4 button{border-left:6px solid #8b5cf6}.c5 button{border-left:6px solid #0ea5e9}
+#logp{flex:1;display:flex;flex-direction:column;background:#fff;border-left:1px solid #ddd;min-width:300px}
+.lt{display:flex;gap:6px;padding:8px;flex-wrap:wrap;border-bottom:1px solid #eee}
+.lt button{flex:1;background:#e5e7eb;font-size:15px;min-height:46px}
+.nt{display:flex;gap:6px;padding:8px 8px 0}.nt input{flex:1;min-width:0;font-size:17px;padding:8px 12px;border:1px solid #ccc;border-radius:10px;min-height:48px}.nt button{background:#2563eb;color:#fff;min-height:48px}
+#log li.note .x{font-style:italic;color:#444}
+.decks{display:flex;gap:8px;padding:6px 12px;background:#e5e7eb;align-items:center;flex-wrap:wrap}.decks input{font-size:16px;padding:8px 10px;border:1px solid #ccc;border-radius:8px;min-height:44px;width:220px}
+.ov{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:10}.ov.show{display:flex}
+.box{background:#fff;border-radius:14px;padding:18px;width:min(560px,92vw);max-height:86vh;max-height:86dvh;overflow:auto}.box h2{margin:0 0 12px}.box .row{display:flex;gap:8px;flex-wrap:wrap}.box .row button{flex:1}
+#stats{position:fixed;inset:0;top:var(--hh,60px);background:#f1f3f6;display:none;overflow:auto;padding:14px;z-index:5}#stats.show{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 3px #0002}.card .v{font-size:28px;font-weight:700}.card .l{color:#666;font-size:14px}
+.cols{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;margin-top:12px}@media (orientation:portrait),(max-width:800px){.cols{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}td,th{padding:10px 8px;border-bottom:1px solid #eee;text-align:left;font-size:15px}
+.ml li{list-style:none;background:#fff;border-radius:10px;margin-bottom:8px;padding:10px;display:flex;gap:8px;align-items:center;cursor:pointer}.ml{padding:0;margin:0}.ml .r{font-weight:700;width:34px;text-align:center;border-radius:6px;color:#fff;padding:4px}.W{background:#16a34a}.L{background:#dc2626}.D{background:#6b7280}
+.ml li .i{flex:1;font-size:15px}.ml li button{min-height:40px;background:#fee2e2}
+pre.lg{white-space:pre-wrap;font-size:14px;background:#f6f6f6;padding:10px;border-radius:8px}
+.fld{margin-bottom:10px}.fl{display:block;font-size:14px;color:#555;margin-bottom:4px}.fi{width:100%;font-size:19px;padding:10px 12px;border:1px solid #bbb;border-radius:10px;min-height:52px}.fi.num{width:110px;flex:none}
+.fr{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.chip{min-height:44px;padding:4px 12px;background:#eef2ff;border-radius:22px;font-size:16px}.chip.q{min-width:48px}.chip.sel{background:#2563eb;color:#fff}.chip.en{min-width:56px}
+.wb{color:#fff;padding:2px 10px;border-radius:8px;font-size:18px}.wb.me{background:#2563eb}.wb.op{background:#dc2626}.box{width:min(640px,94vw)}
+details.setup{background:#fff7ed;border:2px solid #fb923c;border-radius:14px;padding:6px 10px 10px;margin-bottom:6px}details.setup summary{font-size:17px;font-weight:700;color:#c2410c;min-height:40px;line-height:40px;cursor:pointer}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:12px;margin-top:6px;border:3px solid transparent}.step.next{border-color:#f97316;background:#ffedd5;animation:pl 1.6s infinite}@keyframes pl{50%{border-color:#fdba74}}.sn{width:34px;height:34px;flex:none;border-radius:50%;background:#fb923c;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:8px}.sl{font-size:13px;color:#9a3412;margin:2px 0 6px}#coinB,#startB{flex:1;min-height:72px;font-size:21px;font-weight:700}#coinB{background:#fde68a}#startB{background:#16a34a;color:#fff}
+body.prep .sec:not(.setup){opacity:.5}body:not(.prep) #startB{background:#9ca3af}
+#badges{display:flex;gap:4px}.bd{font-size:13px;padding:4px 8px;border-radius:12px;background:#374151;color:#9ca3af}.bd.on{background:#16a34a;color:#fff}.g button.done{opacity:.45}
+#log li.both{border-left:5px solid #a855f7;background:#faf5ff}.wb.both{background:#7c3aed}#setup .g button.hl{outline:3px solid #f97316;background:#fff7ed;font-weight:700}
+.box.wide{width:min(980px,96vw)}.bsec{border:1px solid #e5e7eb;border-radius:12px;padding:8px;margin:8px 0}.bsec h3{margin:2px 0 8px}
+.bslot{display:grid;grid-template-columns:56px 1.6fr 80px 1.1fr 1.1fr 90px;gap:6px;margin-bottom:6px;align-items:center}.bslot .bl{font-size:13px;color:#555}.bslot input,.bslot select{font-size:16px;padding:8px;border:1px solid #bbb;border-radius:8px;min-height:46px;min-width:0;width:100%}
+.bslot[data-i="a"]{background:#fef3c7;border-radius:8px;padding:4px}
+@media (max-width:800px){.bslot{grid-template-columns:48px 1fr 70px;}.bslot .be,.bslot .bt,.bslot .bs{grid-column:span 1}}
+.chk{display:flex;gap:8px;align-items:center;font-size:17px;min-height:44px}.chk input{width:26px;height:26px}.chip small{color:#666;font-size:12px}.chip.sel small{color:#dbeafe}
+.brand{font-weight:800;font-size:16px;color:#fde047;letter-spacing:.5px;margin-right:4px;white-space:nowrap}@media (max-width:1100px){.brand{font-size:14px;max-width:5.5em;white-space:normal;line-height:1.15}}
+#log{list-style:none;margin:0;padding:0;overflow:auto;flex:1}
+#log li{display:flex;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:16px}
+#log li .t{color:#888;font-size:13px;white-space:nowrap}#log li .x{flex:1}
+#log li.me{border-left:5px solid #2563eb}#log li.op{border-left:5px solid #dc2626}#log li.sys{border-left:5px solid #9ca3af;background:#fafafa}
+#log li button{min-height:40px;min-width:40px;background:#fee2e2;font-size:15px}
+@media (orientation:portrait),(max-width:800px){main{flex-direction:column}#logp{border-left:0;border-top:1px solid #ddd;min-width:0;max-height:42vh}}
+</style></head><body>
+<header>
+ <div class="hr">
+ <span class="brand">IANO寶可夢對戰紀錄</span>
+ <div class="grp tog"><button id="pMe" class="me">我方</button><button id="pOp" class="op">對手</button></div>
+ <div class="grp"><span class="turn" id="turn">第 1 回合</span><button id="next" style="background:#10b981;color:#fff">下一回合</button></div>
+ <div class="grp"><span>先攻</span><button id="first" style="background:#6b7280;color:#fff">我方</button></div>
+ <span id="badges"></span><span class="sp"></span>
+ <div class="grp"><button id="endm" style="background:#e11d48;color:#fff">結束對局</button><button id="stb" style="background:#0ea5e9;color:#fff">戰績</button><button id="newg" style="background:#f59e0b">新對局</button></div>
+ </div>
+ <div class="hr">
+ <div class="prize me">我方 獎賞 <button data-pz="me" data-d="-1">−</button><b id="pzMe">6</b><button data-pz="me" data-d="1">+</button> 手牌 <b id="hdMe">–</b> 重抽 <b id="mgMe">0</b> 多抽 <b id="exMe">0</b></div>
+ <div class="prize op">對手 獎賞 <button data-pz="op" data-d="-1">−</button><b id="pzOp">6</b><button data-pz="op" data-d="1">+</button> 手牌 <b id="hdOp">–</b> 重抽 <b id="mgOp">0</b> 多抽 <b id="exOp">0</b></div>
+ <span class="sp"></span><button id="rulesB" style="background:#374151;color:#fff;font-size:15px">規則提醒：開</button>
+ </div>
+</header>
+<div class="decks">我方牌組 <input id="myDeck" list="dl" placeholder="例：密勒頓ex" autocomplete="off"> 對手牌組 <input id="opDeck" list="dl" placeholder="例：沙奈朵ex" autocomplete="off"><datalist id="dl"></datalist></div>
+<div id="stats"></div>
+<div class="ov" id="ov"><div class="box" id="ovb"></div></div>
+<input type="file" id="imf" accept=".json,application/json" hidden>
+<main><div id="acts"></div>
+<section id="logp"><form class="nt" id="ntf"><input id="nti" placeholder="手動輸入紀錄…" enterkeyhint="done" autocomplete="off"><button type="submit">新增</button></form><div class="lt"><button id="undo">↶ 復原</button><button id="copy">複製</button><button id="exp">匯出</button><button id="clr">清除</button></div><ul id="log"></ul></section></main>
+<script>
+const SETUP=["抽起始手牌","Mulligan 重抽","因對方重抽多抽牌","手牌數量","放置基礎寶可夢","放置獎賞卡"];
+const G=[
+["基本行動","c1",["記錄場上寶可夢","抽牌","放置基礎寶可夢","進化","附加能量","撤退","寶可夢交替","使用特性","洗牌","搜尋牌庫"]],
+["訓練家卡","c2",["使用物品卡","使用支援者","使用競技場","使用寶可夢道具"]],
+["戰鬥","c3",["攻擊","使用 GX 招式","使用 VSTAR 力量","擊倒","拿獎賞卡"]],
+["卡片移動","c1",["丟棄卡片","回收卡片"]],
+["特殊狀態","c4",["中毒","灼傷","睡眠","麻痺","混亂","解除特殊狀態","寶可夢檢查"]],
+["其他","c5",["投擲硬幣：正","投擲硬幣：反","結束回合","投降","勝利"]]];
+const ONCE={"使用 GX 招式":"gx","使用 VSTAR 力量":"vs"};
+const used=(w,k)=>S.log.some(e=>e.who===w&&e[k]);
+const hand=w=>{for(let i=S.log.length-1;i>=0;i--){const e=S.log[i];if(e.who===w&&e.hand!=null)return e.hand}return null};
+const mull=w=>S.log.filter(e=>e.who===w&&e.mull).length;
+let RULES=localStorage.getItem("ptcg-rules")!=="0";
+const ONCE_T={"附加能量":"從手牌附加過能量","使用支援者":"使用過支援者","使用競技場":"使用過競技場","撤退":"撤退過"};const BADGE={"附加能量":"能量","使用支援者":"支援者","使用競技場":"競技場","撤退":"撤退"};
+const ATK=["攻擊","使用 GX 招式","使用 VSTAR 力量"];
+const firstTurnOf=w=>w===S.first?1:2;
+const usedTurn=(w,a)=>S.log.filter(e=>!e.prep&&e.turn===S.turn&&e.who===w&&e.act===a).length;
+const extra=w=>S.log.filter(e=>e.who===w&&e.extra).reduce((a,e)=>a+e.extra,0);
+const oth=w=>w==="me"?"op":"me";const SIDESEL=["Mulligan 重抽","因對方重抽多抽牌"];
+const K="ptcg-logger-v1";let S=JSON.parse(localStorage.getItem(K)||"null")||{p:"me",turn:1,first:"me",pz:{me:6,op:6},log:[],id:1};
+const $=i=>document.getElementById(i),N={me:"我方",op:"對手",both:"雙方"};
+function save(){localStorage.setItem(K,JSON.stringify(S))}
+const started=()=>S.log.some(e=>e.start);const coinE=()=>{for(let i=S.log.length-1;i>=0;i--)if(S.log[i].coin)return S.log[i].coin;return null};
+const TL=e=>e.prep?"準備":"T"+e.turn;
+function add(text,who,extra){const prep=!started()&&!(extra&&extra.start);S.log.push({id:S.id++,ts:Date.now(),turn:S.turn,who,text,...(prep?{prep:1}:{}),...extra});save();render()}
+const NK="ptcg-names-v1";let NM=JSON.parse(localStorage.getItem(NK)||"{}");
+function remember(kind,v){v=(v||"").trim();if(!v||!kind)return;const l=(NM[kind]||[]).filter(x=>x!==v);l.unshift(v);NM[kind]=l.slice(0,60);localStorage.setItem(NK,JSON.stringify(NM))}
+const ENERGY=["草","炎","水","雷","超","鬥","惡","鋼","龍","無色"];
+const F=(k,label,o={})=>({k,label,...o});
+const pk=(k,l)=>F(k,l,{kind:"poke"}),cd=(k,l)=>F(k,l,{kind:"card"}),nm=(k,l,d)=>F(k,l,{type:"num",def:d});
+const TR=[cd("card","卡名")];
+const FIELDS={"抽牌":[nm("n","張數",1)],"因對方重抽多抽牌":[nm("n","張數",1)],"手牌數量":[nm("n","目前手牌張數","")],
+"放置基礎寶可夢":[F("pos","位置",{quick:["戰鬥區","備戰區"]}),pk("poke","寶可夢名稱")],"放置獎賞卡":[nm("n","張數",6)],"抽起始手牌":[nm("n","張數",7)],"放到備戰區":[pk("poke","寶可夢名稱")],"進化":[pk("from","從"),pk("to","進化成")],
+"附加能量":[F("en","能量類型",{type:"energy",kind:"energy"}),pk("tgt","附加對象")],
+"使用物品卡":TR,"使用支援者":TR,"使用競技場":TR,"使用寶可夢道具":[cd("card","道具名稱"),pk("tgt","裝備對象")],
+"撤退":[pk("to","新的戰鬥寶可夢")],"寶可夢交替":[pk("to","新的戰鬥寶可夢")],"使用特性":[F("ab","特性名稱",{kind:"ability"}),pk("poke","寶可夢")],
+"攻擊":[F("mv","招式名稱",{kind:"move"}),nm("dmg","傷害","")],"使用 GX 招式":[F("mv","招式名稱",{kind:"move"}),nm("dmg","傷害","")],"使用 VSTAR 力量":[F("mv","招式／特性名稱",{kind:"move"}),nm("dmg","傷害","")],
+"擊倒":[pk("poke","被擊倒的寶可夢")],"拿獎賞卡":[nm("n","張數",1)],"丟棄卡片":[cd("card","卡名"),nm("n","張數",1)],"回收卡片":[cd("card","卡名"),nm("n","張數",1)],
+"搜尋牌庫":[cd("card","找到的卡")]};
+["中毒","灼傷","睡眠","麻痺","混亂","解除特殊狀態"].forEach(s=>FIELDS[s]=[pk("poke","對象寶可夢")]);
+function fmtAct(a,v){const g=k=>(v[k]??"").toString().trim();let t=a,d="";
+ const n=g("n"),x=(s)=>s?"："+s:"";
+ switch(a){case"抽牌":case"因對方重抽多抽牌":case"丟棄卡片":case"回收卡片":d=g("card");t+=x(d)+(n?" ×"+n:"");break;
+ case"放置基礎寶可夢":t+=(g("pos")?"（"+g("pos")+"）":"")+x(g("poke"));break;case"抽起始手牌":t+=n?" ×"+n:"";break;case"放置獎賞卡":t+=n?" ×"+n:"";break;
+ case"拿獎賞卡":t+=" ×"+(n||1);break;case"手牌數量":t+=n?"："+n+" 張":"";break;
+ case"進化":if(g("from")||g("to"))t+="："+(g("from")||"？")+" → "+(g("to")||"？");break;
+ case"附加能量":t+=x([g("en")&&g("en")+"能量",g("tgt")&&"→ "+g("tgt")].filter(Boolean).join(" "));break;
+ case"使用寶可夢道具":t+=x([g("card"),g("tgt")&&"→ "+g("tgt")].filter(Boolean).join(" "));break;
+ case"撤退":case"寶可夢交替":t+=g("to")?"，新的戰鬥寶可夢："+g("to"):"";break;
+ case"使用特性":t+=x([g("poke")&&"〔"+g("poke")+"〕",g("ab")].filter(Boolean).join(""));break;
+ case"攻擊":case"使用 GX 招式":case"使用 VSTAR 力量":t+=x(g("mv"))+(g("dmg")?" "+g("dmg")+" 傷害":"");break;
+ case"搜尋牌庫":t+=g("card")?"，找到："+g("card"):"";break;
+ default:t+=x(g("card")||g("poke")||"")}
+ if(g("memo"))t+="（備註："+g("memo")+"）";return t}
+function chips(kind,filter){const l=(NM[kind]||[]).filter(x=>!filter||x.includes(filter)).slice(0,12);return l.map(x=>`<button type="button" class="chip" data-v="${esc(x)}">${esc(x)}</button>`).join("")}
+function form(a,w,cb){const MX=a==="拿獎賞卡"?S.pz[w]:a==="放置獎賞卡"?6:7;const fs=(FIELDS[a]||[]).concat([F("memo","備註")]);
+ const ss=SIDESEL.includes(a);modal(`<form id="af" novalidate><h2><span class="wb ${w}" id="fW">${N[w]}</span> ${esc(a)}</h2>${ss?`<div class="fr" id="fSide"><button type="button" class="chip sd" data-s="me">我方</button><button type="button" class="chip sd" data-s="op">對手</button></div>`:""}${fs.map((f,i)=>{let h=`<label class="fl">${f.label}</label>`;
+  if(f.type==="num")h+=`<div class="fr"><input class="fi num" data-k="${f.k}" type="number" inputmode="numeric" min="0" ${f.k==="n"&&MX<7?`max="${MX}"`:""} value="${f.k==="n"&&f.def!==""&&f.def!=null?Math.min(f.def,MX):f.def??""}">${f.k==="n"?Array.from({length:MX},(_,i)=>i+1).map(n=>`<button type="button" class="chip q" data-v="${n}">${n}</button>`).join(""):""}</div>`;
+  else if(f.type==="energy")h+=`<div class="fr">${ENERGY.map(e=>`<button type="button" class="chip en" data-v="${e}">${e}</button>`).join("")}</div><input class="fi" data-k="${f.k}" placeholder="或自訂（例：雙重渦輪）" autocomplete="off"><div class="fr ch" data-kind="energy">${chips("energy")}</div>`;
+  else h+=(f.quick?`<div class="fr">${f.quick.map(q=>`<button type="button" class="chip" data-v="${q}">${q}</button>`).join("")}</div>`:"")+`<input class="fi" data-k="${f.k}" ${f.kind?`data-kind="${f.kind}"`:""} autocomplete="off" enterkeyhint="done"><div class="fr ch">${f.kind?chips(f.kind):""}</div>`;
+  return `<div class="fld">${h}</div>`}).join("")}
+ ${a==="放置基礎寶可夢"?`<label class="chk"><input type="checkbox" id="fBd" checked> 加入場上紀錄</label>`:""}<div class="row" style="margin-top:14px"><button type="submit" id="fOk" style="background:#2563eb;color:#fff">記錄</button><button type="button" id="fSkip" style="background:#e5e7eb">略過</button><button type="button" id="fCan" style="background:#fee2e2">取消</button></div></form>`);
+ const box=$("ovb");box.querySelectorAll(".fld").forEach(fd=>{const inp=fd.querySelector(".fi");
+  fd.addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;inp.value=b.dataset.v;fd.querySelectorAll(".chip").forEach(c=>c.classList.toggle("sel",c===b));inp.focus()});
+  if(inp.dataset.kind){const ch=fd.querySelector(".ch");inp.addEventListener("input",()=>{ch.innerHTML=chips(inp.dataset.kind,inp.value.trim())})}});
+ const upd=()=>{$("fW").className="wb "+w;$("fW").textContent=N[w];box.querySelectorAll(".sd").forEach(b=>b.classList.toggle("sel",b.dataset.s===w));
+  if(a==="因對方重抽多抽牌"){const i=box.querySelector('.fi[data-k="n"]');i.value=mull(oth(w));box.querySelectorAll(".chip.q").forEach(c=>c.classList.toggle("sel",c.dataset.v==i.value))}};
+ if(ss){box.querySelectorAll(".sd").forEach(b=>b.onclick=()=>{w=b.dataset.s;upd()});upd()}
+ box.querySelectorAll(".fi.num[max]").forEach(i=>i.addEventListener("input",()=>{if(+i.value>+i.max)i.value=i.max}));
+ const vals=()=>{const v={};box.querySelectorAll(".fi").forEach(i=>v[i.dataset.k]=i.value);return v};
+ $("af").onsubmit=e=>{e.preventDefault();const v=vals();if($("fBd"))v.__bd=$("fBd").checked;box.querySelectorAll(".fi[data-kind]").forEach(i=>remember(i.dataset.kind,i.value));closeM();cb(v,w)};
+ $("fSkip").onclick=()=>{closeM();cb({},w)};$("fCan").onclick=closeM;
+ setTimeout(()=>{const f=box.querySelector(".fi");if(f){f.focus();if(f.select)f.select()}},50)}
+var act;act=function(a){const w=a==="放置獎賞卡"?"both":S.p;
+ if(a==="寶可夢檢查"){checkup();return}
+ if(a==="記錄場上寶可夢"){boardModal(S.p);return}
+ if(a==="擊倒"){koModal(S.p);return}
+ if(a==="附加能量"){energyModal(w);return}
+ if(RULES&&started()){const warn=[],u=x=>usedTurn(w,x)>0,ft=S.turn===firstTurnOf(w);
+  if(ONCE_T[a]&&a!=="附加能量"&&u(a))warn.push(N[w]+"本回合已"+ONCE_T[a]+"（每回合限一次）");
+  if(S.turn===1&&w===S.first&&a==="使用支援者")warn.push("先攻方第 1 回合不能使用支援者");
+  if(S.turn===1&&w===S.first&&ATK.includes(a)&&a!=="使用 VSTAR 力量")warn.push("先攻方第 1 回合不能攻擊");
+  if(a==="進化"&&ft)warn.push(N[w]+"的第一個回合不能進化");
+  if(warn.length&&!confirm("⚠ "+warn.join("\n⚠ ")+"\n\n仍要記錄？"))return}
+ if(a==="進化"){evoModal(w);return}
+ if(a==="撤退"||a==="寶可夢交替"){swapModal(w,a);return}
+ if(a==="拿獎賞卡"&&S.pz[w]<=0){alert(N[w]+"的獎賞卡已經拿完了（剩 0 張），未記錄。");return}
+ if(ONCE[a]&&used(w,ONCE[a])&&!confirm(N[w]+"本局已"+a+"過（每場限一次），仍要記錄？"))return;
+ form(a,w,(v,w)=>{const ex={act:a,vals:{...v}};const n=parseInt(v.n);
+  if(a==="因對方重抽多抽牌"){const k=isNaN(n)?mull(oth(w)):n;v.n=k||"";if(k>0)ex.extra=k}
+  if(a==="Mulligan 重抽"){ex.mull=1;v.memo=(v.memo?v.memo+"；":"")+"第 "+(mull(w)+1)+" 次";}
+  if(ONCE[a])ex[ONCE[a]]=1;
+  if(a==="抽起始手牌"&&!isNaN(n)&&n>=0)ex.hand=n;
+  if(a==="手牌數量"&&!isNaN(n)&&n>=0)ex.hand=n;
+  if(a==="拿獎賞卡"){if(S.pz[w]<=0){alert(N[w]+"的獎賞卡已經拿完了，未記錄。");return}const k=isNaN(n)||n<1?1:n;const take=Math.min(k,S.pz[w]);v.n=take;S.pz[w]-=take;ex.pz=take}
+  if(a==="放置獎賞卡"){const k=isNaN(n)?6:Math.max(0,Math.min(6,n));v.n=k;ex.pzSet={...S.pz};S.pz={me:k,op:k}}
+  if(a==="放置基礎寶可夢"&&v.__bd&&(v.poke||"").trim()){const nb=JSON.parse(JSON.stringify(lastBoard(w)||{active:null,bench:[]})),p={name:v.poke.trim(),dmg:0,en:"",tool:"",st:""};
+   if(v.pos==="戰鬥區"&&!nb.active)nb.active=p;else if(nb.bench.length<8)nb.bench.push(p);ex.board={[w]:nb}}
+  delete ex.vals.__bd;
+  add(fmtAct(a,v),w,ex);
+  if(RULES&&started()&&ATK.includes(a)&&confirm("攻擊後回合結束。結束回合並進入下一回合？")){add("結束回合",w,{act:"結束回合"});nextTurn()}
+  if(a==="拿獎賞卡"&&S.pz[w]===0&&confirm(N[w]+"已拿完最後一張獎賞卡！要以「"+N[w]+"勝」結束對局嗎？"))endMatch(w==="me"?"W":"L")})};
+function fmt(e){const d=new Date(e.ts);return d.toLocaleTimeString("zh-TW",{hour12:false})}
+function line(e){return `[${fmt(e)}] ${TL(e)} ${e.who==="sys"?"系統":N[e.who]} ${e.note?"✎ ":""}${e.text}`}
+function render(){$("pMe").classList.toggle("on",S.p==="me");$("pOp").classList.toggle("on",S.p==="op");
+ const st=started(); $("rulesB").textContent="規則提醒："+(RULES?"開":"關");$("rulesB").style.background=RULES?"#7c3aed":"#374151";
+ $("badges").innerHTML=st&&RULES?Object.entries(BADGE).map(([a,l])=>{const u=usedTurn(S.p,a)>0;return `<span class="bd${u?" on":""}">${l}${u?"✓":""}</span>`}).join(""):"";
+ Object.keys(BADGE).forEach(a=>document.querySelectorAll(`[data-a="${a}"]`).forEach(b=>b.classList.toggle("done",st&&RULES&&usedTurn(S.p,a)>0)));
+ $("turn").textContent=st?"第 "+S.turn+" 回合":"準備中";document.body.classList.toggle("prep",!st);if(!SETUP_TOUCHED)$("setup").open=!st;const has=a=>S.log.some(e=>e.act===a||e.text.startsWith(a)),nx=st?0:!coinE()?1:!(has("抽起始手牌")&&has("放置獎賞卡"))?2:3;const nb=nx===2?(has("抽起始手牌")?"放置獎賞卡":"抽起始手牌"):"";document.querySelectorAll("#setup [data-a]").forEach(b=>b.classList.toggle("hl",b.dataset.a===nb));[1,2,3].forEach(i=>$("st"+i).classList.toggle("next",i===nx));$("first").textContent=N[S.first];$("pzMe").textContent=S.pz.me;$("pzOp").textContent=S.pz.op;
+ ["me","op"].forEach(w=>{const W=w==="me"?"Me":"Op";$("hd"+W).textContent=hand(w)??"–";$("mg"+W).textContent=mull(w);$("ex"+W).textContent=extra(w)});
+ Object.entries(ONCE).forEach(([a,k])=>{const b=document.querySelector(`[data-a="${a}"]`);if(b){const u=used(S.p,k);b.classList.toggle("used",u);b.textContent=a+(u?"（已用）":"")}});
+ $("log").innerHTML=S.log.slice().reverse().map(e=>`<li class="${e.who}${e.note?" note":""}"><span class="t">${fmt(e)}<br>${TL(e)}</span><span class="x"><b>${e.who==="sys"?"":N[e.who]+" "}</b>${e.note?"✎ ":""}${esc(e.text)}</span><button data-del="${e.id}">✕</button></li>`).join("")}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+
+const STS=["","中毒","灼傷","睡眠","麻痺","混亂"];
+function lastBoard(w){for(let i=S.log.length-1;i>=0;i--){const b=S.log[i].board;if(b&&b[w])return b[w]}return null}
+function slotTxt(p){const d=[p.en,p.dmg?p.dmg+"傷害":"",p.tool,p.st].filter(Boolean);return p.name+(d.length?"("+d.join(", ")+")":"")}
+function boardTxt(b){return "戰鬥 "+(b.active?slotTxt(b.active):"（無）")+"｜備戰 "+(b.bench.length?b.bench.map(slotTxt).join("、"):"（無）")}
+function boardModal(sel){
+ const sides=sel==="both"?["me","op"]:[sel];
+ const row=(w,i,p,lab)=>`<div class="bslot" data-w="${w}" data-i="${i}"><span class="bl">${lab}</span><input class="bn" list="dlPoke" placeholder="寶可夢" value="${esc(p.name||"")}" autocomplete="off"><input class="bd2" type="number" inputmode="numeric" min="0" step="10" placeholder="傷害" value="${p.dmg||""}"><input class="be" list="dlEn" placeholder="能量 例：雷×2" value="${esc(p.en||"")}"><input class="bt" list="dlCard" placeholder="道具" value="${esc(p.tool||"")}"><select class="bs">${STS.map(x=>`<option${x===(p.st||"")?" selected":""} value="${x}">${x||"狀態"}</option>`).join("")}</select></div>`;
+ const sec=w=>{const b=lastBoard(w)||{active:null,bench:[]};const n=Math.max(5,b.bench.length);
+  return `<div class="bsec" data-w="${w}"><h3><span class="wb ${w}">${N[w]}</span>${lastBoard(w)?' <small style="color:#888;font-weight:400">（已帶入上次紀錄）</small>':""}</h3>${row(w,"a",b.active||{},"戰鬥")}<div class="bbench">${Array.from({length:n},(_,i)=>row(w,i,b.bench[i]||{},"備戰"+(i+1))).join("")}</div><button type="button" class="chip addb" data-w="${w}">＋ 增加備戰欄位（最多 8）</button></div>`};
+ modal(`<form id="bf" novalidate><h2>記錄場上寶可夢</h2><div class="fr">${["me","op","both"].map(x=>`<button type="button" class="chip bsd${x===sel?" sel":""}" data-s="${x}">${N[x]}</button>`).join("")}</div>
+ <datalist id="dlPoke">${(NM.poke||[]).map(x=>`<option value="${esc(x)}">`).join("")}</datalist><datalist id="dlCard">${(NM.card||[]).map(x=>`<option value="${esc(x)}">`).join("")}</datalist><datalist id="dlEn">${ENERGY.flatMap(e=>[e+"×1",e+"×2",e+"×3"]).map(x=>`<option value="${x}">`).join("")}</datalist>
+ ${sides.map(sec).join("")}<div class="fld"><label class="fl">備註</label><input class="fi" id="bmemo" autocomplete="off"></div>
+ <div class="row" style="margin-top:12px"><button type="submit" id="bOk" style="background:#2563eb;color:#fff">記錄</button><button type="button" id="bCan" style="background:#fee2e2">取消</button></div></form>`);
+ const box=$("ovb");box.classList.add("wide");
+ box.querySelectorAll(".bsd").forEach(b=>b.onclick=()=>boardModal(b.dataset.s));
+ box.querySelectorAll(".addb").forEach(b=>b.onclick=()=>{const bb=b.parentNode.querySelector(".bbench"),k=bb.children.length;if(k>=8)return alert("備戰區最多 8 隻");bb.insertAdjacentHTML("beforeend",row(b.dataset.w,k,{},"備戰"+(k+1)))});
+ $("bCan").onclick=closeM;
+ $("bf").onsubmit=e=>{e.preventDefault();const board={};
+  sides.forEach(w=>{const rd=el=>({name:el.querySelector(".bn").value.trim(),dmg:parseInt(el.querySelector(".bd2").value)||0,en:el.querySelector(".be").value.trim(),tool:el.querySelector(".bt").value.trim(),st:el.querySelector(".bs").value});
+   const sl=[...box.querySelectorAll(`.bslot[data-w="${w}"]`)].map(rd);sl.forEach(p=>{remember("poke",p.name);remember("card",p.tool)});
+   const a=sl[0].name?sl[0]:null;board[w]={active:a,bench:sl.slice(1).filter(p=>p.name)}});
+  const memo=$("bmemo").value.trim();
+  let t=sides.length===1?"場上："+boardTxt(board[sides[0]]):"場上 — 我方："+boardTxt(board.me)+"；對手："+boardTxt(board.op);
+  if(memo)t+="（備註："+memo+"）";closeM();add(t,sel,{act:"記錄場上寶可夢",board})};
+ setTimeout(()=>{const f=box.querySelector(".bn");if(f)f.focus()},50)}
+
+const prizeOf=n=>/VMAX/i.test(n)?3:(/ex$|ex[\s(（]|VSTAR|\bV$|\sV\b|GX/i.test(n)?2:1);
+function seenNames(v){const o=[];S.log.forEach(e=>{if(e.who!==v||!e.vals)return;[e.vals.poke,e.vals.to].forEach(x=>{x=(x||"").trim();if(x&&!o.includes(x))o.push(x)})});return o}
+function koModal(w,v){v=v||oth(w);const b=lastBoard(v),sel=new Set();
+ const opts=b?[...(b.active?[{name:b.active.name,pos:"戰鬥區",i:"a"}]:[]),...b.bench.map((p,i)=>({name:p.name,pos:"備戰區",i}))]:seenNames(v).map((n,i)=>({name:n,pos:"",i:"s"+i}));
+ modal(`<form id="kf" novalidate><h2><span class="wb ${w}">${N[w]}</span> 擊倒</h2><label class="fl">被擊倒的是誰的寶可夢</label><div class="fr">${["op","me"].map(x=>`<button type="button" class="chip kv${x===v?" sel":""}" data-v="${x}">${N[x]}</button>`).join("")}</div>
+ <label class="fl">${b?"從場上紀錄選擇（可複選）":"從紀錄中出現過的名稱選擇（可複選；尚無場上紀錄）"}</label><div class="fr" id="kOpts">${opts.map((o,k)=>`<button type="button" class="chip ko" data-k="${k}">${o.pos?`<small>${o.pos==="戰鬥區"?"戰鬥":"備戰"}</small> `:""}${esc(o.name)}</button>`).join("")||'<span style="color:#888">（無）</span>'}</div>
+ <label class="fl">其他（自由輸入，可用「、」分隔多隻）</label><div class="fr"><button type="button" class="chip kp sel" data-p="戰鬥區">戰鬥區</button><button type="button" class="chip kp" data-p="備戰區">備戰區</button></div><input class="fi" id="kFree" list="dlPoke" autocomplete="off"><datalist id="dlPoke">${(NM.poke||[]).map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
+ <div class="fld" style="margin-top:8px"><label class="fl">備註</label><input class="fi" id="kMemo" autocomplete="off"></div>
+ <div class="row" style="margin-top:12px"><button type="submit" style="background:#2563eb;color:#fff" id="kOk">記錄</button><button type="button" id="kSkip" style="background:#e5e7eb">略過</button><button type="button" id="kCan" style="background:#fee2e2">取消</button></div></form>`);
+ const box=$("ovb");let fp="戰鬥區";
+ box.querySelectorAll(".kv").forEach(x=>x.onclick=()=>koModal(w,x.dataset.v));
+ box.querySelectorAll(".ko").forEach(x=>x.onclick=()=>{const k=+x.dataset.k;sel.has(k)?sel.delete(k):sel.add(k);x.classList.toggle("sel",sel.has(k))});
+ box.querySelectorAll(".kp").forEach(x=>x.onclick=()=>{fp=x.dataset.p;box.querySelectorAll(".kp").forEach(y=>y.classList.toggle("sel",y===x))});
+ $("kCan").onclick=closeM;$("kSkip").onclick=()=>{closeM();add("擊倒",w,{act:"擊倒"})};
+ $("kf").onsubmit=e=>{e.preventDefault();const list=[...sel].sort().map(k=>opts[k]);
+  $("kFree").value.split(/[、,，]/).map(x=>x.trim()).filter(Boolean).forEach(n=>{remember("poke",n);const m=b&&opts.find(o=>o.name===n&&o.pos===fp&&!list.includes(o));list.push(m||{name:n,pos:fp,i:null})});
+  if(!list.length){closeM();add("擊倒",w,{act:"擊倒"});return}
+  const memo=$("kMemo").value.trim();
+  const t="擊倒 "+list.map(o=>N[v]+(o.pos||"")+"的 "+o.name).join("、")+(memo?"（備註："+memo+"）":"");
+  closeM();add(t,w,{act:"擊倒",ko:{victim:v,list}});koFollow(w,v,list,b)};
+ setTimeout(()=>{},0)}
+function koFollow(w,v,list,b){const pz=Math.min(S.pz[w],list.reduce((a,o)=>a+prizeOf(o.name),0));
+ const actKO=list.some(o=>o.pos==="戰鬥區");
+ const remain=b?b.bench.filter((p,i)=>!list.some(o=>o.pos==="備戰區"&&(o.i===i||(o.i==null&&o.name===p.name)))):[];
+ modal(`<h2>擊倒後續</h2>
+ <label class="chk"><input type="checkbox" id="fPz" ${S.pz[w]>0?"checked":"disabled"}> ${N[w]}拿獎賞卡</label><div class="fr"><input class="fi num" id="fPzN" type="number" min="0" max="${S.pz[w]}" value="${pz}">${Array.from({length:S.pz[w]},(_,i)=>`<button type="button" class="chip q" data-v="${i+1}">${i+1}</button>`).join("")}<span style="color:#666">（剩 ${S.pz[w]} 張；ex/V/VSTAR=2、VMAX=3）</span></div>
+ ${b?`<label class="chk"><input type="checkbox" id="fRm" checked> 從${N[v]}的場上紀錄移除被擊倒的寶可夢</label>`:""}
+ ${actKO?`<label class="fl" style="margin-top:8px">${N[v]}的新戰鬥寶可夢（從備戰區）</label><div class="fr" id="fNa">${remain.map((p,i)=>`<button type="button" class="chip na" data-i="${i}">${esc(p.name)}</button>`).join("")}</div><input class="fi" id="fNaT" list="dlPoke" placeholder="或輸入名稱" autocomplete="off"><datalist id="dlPoke">${(NM.poke||[]).map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`:""}
+ <div class="row" style="margin-top:12px"><button id="fOk2" style="background:#2563eb;color:#fff">確認</button><button id="fNo" style="background:#e5e7eb">略過</button></div>`);
+ const box=$("ovb");let na=null;
+ box.querySelectorAll(".chip.q").forEach(x=>x.onclick=()=>{$("fPzN").value=x.dataset.v});
+ box.querySelectorAll(".na").forEach(x=>x.onclick=()=>{na=+x.dataset.i;$("fNaT").value="";box.querySelectorAll(".na").forEach(y=>y.classList.toggle("sel",y===x))});
+ $("fNo").onclick=closeM;
+ $("fOk2").onclick=()=>{const doPz=$("fPz").checked;let k=parseInt($("fPzN").value);closeM();
+  const naName=actKO?(($("fNaT")&&$("fNaT").value.trim())||(na!=null?remain[na].name:"")):"";
+  if(b&&KO_RM){let nb={active:actKO?null:b.active,bench:remain.slice()};
+   if(naName){const j=nb.bench.findIndex(p=>p.name===naName);nb.active=j>=0?nb.bench.splice(j,1)[0]:{name:naName,dmg:0,en:"",tool:"",st:""};remember("poke",naName)}
+   add("場上（擊倒後更新）："+boardTxt(nb),v,{act:"記錄場上寶可夢",board:{[v]:nb}})}
+  else if(naName)add("新的戰鬥寶可夢："+naName,v,{act:"寶可夢交替"});
+  if(doPz&&k>0&&S.pz[w]>0){const take=Math.min(k,S.pz[w]);S.pz[w]-=take;add("拿獎賞卡 ×"+take,w,{act:"拿獎賞卡",pz:take});
+   if(S.pz[w]===0&&confirm(N[w]+"已拿完最後一張獎賞卡！要以「"+N[w]+"勝」結束對局嗎？"))endMatch(w==="me"?"W":"L")}};
+ const rm=$("fRm");KO_RM=true;if(rm)rm.onchange=()=>{KO_RM=rm.checked}}
+let KO_RM=true;
+
+function addEn(str,type,n){const m={},ord=[];(str||"").split(/[、,，\s]+/).filter(Boolean).forEach(t=>{const x=t.match(/^(.+?)[×xX*](\d+)$/);const k=x?x[1]:t,c=x?+x[2]:1;if(!(k in m)){m[k]=0;ord.push(k)}m[k]+=c});
+ if(!(type in m)){m[type]=0;ord.push(type)}m[type]+=n;return ord.map(k=>k+"×"+m[k]).join("、")}
+function energyModal(w){const b=lastBoard(w);let src="手牌",en="",tIdx=null;
+ const tg=b?[...(b.active?[{name:b.active.name,i:"a",l:"戰鬥"}]:[]),...b.bench.map((p,i)=>({name:p.name,i,l:"備戰"}))]:[];
+ modal(`<form id="ef" novalidate><h2><span class="wb ${w}">${N[w]}</span> 附加能量</h2>
+ <label class="fl">來源</label><div class="fr">${["手牌","牌庫","棄牌區"].map(x=>`<button type="button" class="chip es${x===src?" sel":""}" data-v="${x}">${x}</button>`).join("")}</div>
+ <label class="fl">能量類型</label><div class="fr">${ENERGY.map(e=>`<button type="button" class="chip en" data-v="${e}">${e}</button>`).join("")}</div><input class="fi" id="eT" placeholder="或自訂（例：雙重渦輪）" autocomplete="off">
+ <label class="fl" style="margin-top:8px">張數</label><div class="fr"><input class="fi num" id="eN" type="number" min="1" value="1">${[1,2,3,4].map(n=>`<button type="button" class="chip q${n===1?" sel":""}" data-v="${n}">${n}</button>`).join("")}</div>
+ <label class="fl">附加對象</label><div class="fr">${tg.map((t,k)=>`<button type="button" class="chip et" data-k="${k}"><small>${t.l}</small> ${esc(t.name)}</button>`).join("")||'<span style="color:#888">（尚無場上紀錄，請直接輸入）</span>'}</div><input class="fi" id="eTg" list="dlPoke" placeholder="或輸入寶可夢名稱" autocomplete="off"><datalist id="dlPoke">${(NM.poke||[]).map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
+ ${b?`<label class="chk"><input type="checkbox" id="eUp" checked> 同步更新場上紀錄的能量</label>`:""}
+ <div class="fld" style="margin-top:6px"><label class="fl">備註</label><input class="fi" id="eM" autocomplete="off"></div>
+ <div class="row" style="margin-top:12px"><button type="submit" style="background:#2563eb;color:#fff" id="eOk">記錄</button><button type="button" id="eSkip" style="background:#e5e7eb">略過</button><button type="button" id="eCan" style="background:#fee2e2">取消</button></div></form>`);
+ const box=$("ovb"),grp=(c,f)=>box.querySelectorAll(c).forEach(x=>x.onclick=()=>{box.querySelectorAll(c).forEach(y=>y.classList.toggle("sel",y===x));f(x)});
+ grp(".es",x=>src=x.dataset.v);grp(".en",x=>{en=x.dataset.v;$("eT").value=""});grp(".chip.q",x=>$("eN").value=x.dataset.v);grp(".et",x=>{tIdx=+x.dataset.k;$("eTg").value=tg[tIdx].name});
+ $("eT").oninput=()=>{en="";box.querySelectorAll(".en").forEach(y=>y.classList.remove("sel"))};$("eTg").oninput=()=>{tIdx=null;box.querySelectorAll(".et").forEach(y=>y.classList.remove("sel"))};
+ $("eCan").onclick=closeM;
+ const chk=()=>!(src==="手牌"&&RULES&&started()&&usedTurn(w,"附加能量")>0&&!confirm("⚠ "+N[w]+"本回合已從手牌附加過能量（每回合限一次）\n\n仍要記錄？"));
+ $("eSkip").onclick=()=>{if(!chk())return;closeM();add("附加能量",w,{act:"附加能量"})};
+ $("ef").onsubmit=e=>{e.preventDefault();if(!chk())return;
+  const type=($("eT").value.trim()||en),n=Math.max(1,parseInt($("eN").value)||1),tgt=$("eTg").value.trim(),memo=$("eM").value.trim();
+  if($("eT").value.trim())remember("energy",type);if(tgt)remember("poke",tgt);
+  let t="附加能量（從"+src+"）";const d=[type&&(type+"能量"+(n>1?"×"+n:"")),tgt&&"→ "+tgt].filter(Boolean).join(" ");if(d)t+="："+d;else if(n>1)t+=" ×"+n;if(memo)t+="（備註："+memo+"）";
+  const ex={act:src==="手牌"?"附加能量":"附加能量(效果)",src,en:{type,n,tgt}};
+  if(b&&$("eUp")&&$("eUp").checked&&type&&tgt){const nb=JSON.parse(JSON.stringify(b));let slot=null;
+   if(tIdx!=null){const o=tg[tIdx];slot=o.i==="a"?nb.active:nb.bench[o.i]}else{slot=nb.active&&nb.active.name===tgt?nb.active:nb.bench.find(p=>p.name===tgt)}
+   if(slot){slot.en=addEn(slot.en,type,n);ex.board={[w]:nb}}}
+  closeM();add(t,w,ex)};
+ setTimeout(()=>{},0)}
+
+const cp=o=>JSON.parse(JSON.stringify(o));
+const tgList=b=>b?[...(b.active?[{name:b.active.name,i:"a",l:"戰鬥"}]:[]),...b.bench.map((p,i)=>({name:p.name,i,l:"備戰"}))]:[];
+const slotOf=(nb,o)=>o.i==="a"?nb.active:nb.bench[o.i];
+function subEn(str,type,n){const m={},ord=[];(str||"").split(/[、,，\s]+/).filter(Boolean).forEach(t=>{const x=t.match(/^(.+?)[×xX*](\d+)$/);const k=x?x[1]:t,c=x?+x[2]:1;if(!(k in m)){m[k]=0;ord.push(k)}m[k]+=c});
+ if(type){if(type in m)m[type]=Math.max(0,m[type]-n)}else{let left=n;for(const k of ord.slice().reverse()){const d=Math.min(left,m[k]);m[k]-=d;left-=d}}
+ return ord.filter(k=>m[k]>0).map(k=>k+"×"+m[k]).join("、")}
+const pkDl=()=>`<datalist id="dlPoke">${(NM.poke||[]).map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
+const pick=(box,cls,inp,f)=>{box.querySelectorAll(cls).forEach(x=>x.onclick=()=>{box.querySelectorAll(cls).forEach(y=>y.classList.toggle("sel",y===x));f(+x.dataset.k)});$(inp).addEventListener("input",()=>{box.querySelectorAll(cls).forEach(y=>y.classList.remove("sel"));f(null)})};
+const btns=(p)=>`<div class="fld" style="margin-top:6px"><label class="fl">備註</label><input class="fi" id="${p}M" autocomplete="off"></div><div class="row" style="margin-top:12px"><button type="submit" style="background:#2563eb;color:#fff" id="${p}Ok">記錄</button><button type="button" id="${p}Skip" style="background:#e5e7eb">略過</button><button type="button" id="${p}Can" style="background:#fee2e2">取消</button></div>`;
+function evoModal(w){const b=lastBoard(w),tg=tgList(b);let k=null;
+ modal(`<form id="vf" novalidate><h2><span class="wb ${w}">${N[w]}</span> 進化</h2><label class="fl">從</label><div class="fr">${tg.map((t,i)=>`<button type="button" class="chip vt" data-k="${i}"><small>${t.l}</small> ${esc(t.name)}</button>`).join("")||'<span style="color:#888">（尚無場上紀錄，請直接輸入）</span>'}</div>
+ <input class="fi" id="vFrom" list="dlPoke" placeholder="或輸入寶可夢名稱" autocomplete="off"><label class="fl" style="margin-top:8px">進化成</label><input class="fi" id="vTo" list="dlPoke" autocomplete="off">${pkDl()}
+ ${b?`<label class="chk"><input type="checkbox" id="vUp" checked> 更新場上紀錄（保留能量／傷害／道具；戰鬥區會解除特殊狀態）</label>`:""}${btns("v")}</form>`);
+ const box=$("ovb");pick(box,".vt","vFrom",i=>{k=i;if(i!=null)$("vFrom").value=tg[i].name});
+ $("vCan").onclick=closeM;$("vSkip").onclick=()=>{closeM();add("進化",w,{act:"進化"})};
+ $("vf").onsubmit=e=>{e.preventDefault();const from=$("vFrom").value.trim(),to=$("vTo").value.trim(),memo=$("vM").value.trim();remember("poke",from);remember("poke",to);
+  const ex={act:"進化",vals:{from,to,memo}};
+  if(b&&$("vUp").checked&&to){const nb=cp(b);let o=k!=null?tg[k]:tg.find(t=>t.name===from);if(o){const sl=slotOf(nb,o);sl.name=to;if(o.i==="a")sl.st="";ex.board={[w]:nb}}}
+  closeM();add(fmtAct("進化",{from,to,memo}),w,ex)};
+ setTimeout(()=>{(tg.length?$("vTo"):$("vFrom")).focus()},50)}
+function swapModal(w,a){const b=lastBoard(w);const bench=b?b.bench.map((p,i)=>({name:p.name,i})):[];let k=null,dt="";
+ modal(`<form id="sf" novalidate><h2><span class="wb ${w}">${N[w]}</span> ${a}</h2>${b&&b.active?`<p style="margin:0 0 6px;color:#555">目前戰鬥：<b>${esc(b.active.name)}</b>${b.active.en?"（"+esc(b.active.en)+"）":""}</p>`:""}
+ <label class="fl">新的戰鬥寶可夢（從備戰區）</label><div class="fr">${bench.map((t,i)=>`<button type="button" class="chip sw" data-k="${i}">${esc(t.name)}</button>`).join("")||'<span style="color:#888">（尚無備戰區紀錄，請直接輸入）</span>'}</div>
+ <input class="fi" id="sTo" list="dlPoke" placeholder="或輸入寶可夢名稱" autocomplete="off">${pkDl()}
+ ${a==="撤退"?`<label class="fl" style="margin-top:8px">丟棄能量（選填）</label><div class="fr">${ENERGY.map(e=>`<button type="button" class="chip dt" data-v="${e}">${e}</button>`).join("")}</div><div class="fr"><input class="fi num" id="sN" type="number" min="0" value="">${[1,2,3,4].map(n=>`<button type="button" class="chip q" data-v="${n}">${n}</button>`).join("")}</div>`:""}
+ ${b?`<label class="chk"><input type="checkbox" id="sUp" checked> 更新場上紀錄（交換戰鬥／備戰${a==="撤退"?"、扣除丟棄的能量":""}；換下的寶可夢解除特殊狀態）</label>`:""}${btns("s")}</form>`);
+ const box=$("ovb");pick(box,".sw","sTo",i=>{k=i;if(i!=null)$("sTo").value=bench[i].name});
+ box.querySelectorAll(".dt").forEach(x=>x.onclick=()=>{dt=dt===x.dataset.v?"":x.dataset.v;box.querySelectorAll(".dt").forEach(y=>y.classList.toggle("sel",y.dataset.v===dt));if(!$("sN").value)$("sN").value=1});
+ box.querySelectorAll(".chip.q").forEach(x=>x.onclick=()=>{$("sN").value=x.dataset.v;box.querySelectorAll(".chip.q").forEach(y=>y.classList.toggle("sel",y===x))});
+ $("sCan").onclick=closeM;$("sSkip").onclick=()=>{closeM();add(a,w,{act:a})};
+ $("sf").onsubmit=e=>{e.preventDefault();const to=$("sTo").value.trim(),memo=$("sM").value.trim(),n=a==="撤退"?parseInt($("sN").value)||0:0;remember("poke",to);
+  let t=a+(to?"，新的戰鬥寶可夢："+to:"")+(n?"（丟棄"+(dt?dt+"能量":"能量")+"×"+n+"）":"")+(memo?"（備註："+memo+"）":"");
+  const ex={act:a,vals:{to,memo,discard:n,dtype:dt}};
+  if(b&&$("sUp").checked&&(to||n)){const nb=cp(b),old=nb.active;
+   if(old&&n)old.en=subEn(old.en,dt,n);
+   if(to){let j=k!=null?k:nb.bench.findIndex(p=>p.name===to);const nw=j>=0?nb.bench[j]:{name:to,dmg:0,en:"",tool:"",st:""};
+    if(old){old.st="";if(j>=0)nb.bench[j]=old;else nb.bench.push(old)}else if(j>=0)nb.bench.splice(j,1);nb.active=nw}
+   ex.board={[w]:nb}}
+  closeM();add(t,w,ex)};
+ setTimeout(()=>{$("sTo").focus()},50)}
+function checkup(){const w=S.p,o=(x,lab)=>`<button data-ck="${x}" style="background:#ede9fe">${lab}</button>`;
+ modal(`<h2>寶可夢檢查（${N[w]}）</h2><div class="row">${o("p","中毒：10 傷害")}${o("bh","灼傷：20 傷害＋硬幣正→解除")}${o("bt","灼傷：20 傷害＋硬幣反→持續")}</div><div class="row" style="margin-top:8px">${o("sh","睡眠：硬幣正→醒來")}${o("st","睡眠：硬幣反→繼續睡")}${o("pr","麻痺解除")}</div><div class="row" style="margin-top:8px"><button id="ckN" style="background:#e5e7eb">無事（記錄檢查）</button><button id="mC" style="background:#1f2937;color:#fff">完成</button></div>`);
+ const L={p:"中毒 10 傷害",bh:"灼傷 20 傷害，硬幣正，灼傷解除",bt:"灼傷 20 傷害，硬幣反，灼傷持續",sh:"睡眠硬幣正，醒來",st:"睡眠硬幣反，繼續睡眠",pr:"麻痺解除"};
+ $("ovb").querySelectorAll("[data-ck]").forEach(b=>b.onclick=()=>{add("寶可夢檢查："+L[b.dataset.ck],w,{ck:1});b.style.outline="3px solid #8b5cf6"});
+ $("ckN").onclick=()=>{add("寶可夢檢查：無特殊狀態",w,{ck:1});closeM()};$("mC").onclick=closeM}
+function rm(e){if(e.pzSet){const i=S.log.indexOf(e),later=i<0?null:S.log.slice(i+1).find(x=>x.pzSet);if(later)later.pzSet=e.pzSet;else S.pz={...e.pzSet}}if(e.start)S.p=e.prevP;if(e.coin)S.first=e.coin.prevFirst;if(e.pz)S.pz[e.who]=Math.min(6,S.pz[e.who]+e.pz);if(e.turnUndo){S.turn--;S.p=e.prevP}}
+let SETUP_TOUCHED=0;
+$("acts").innerHTML=`<details class="sec setup" id="setup" open><summary>對戰準備</summary>
+<div class="step" id="st1"><span class="sn">1</span><button id="coinB">🪙 擲硬幣決定先後攻</button></div>
+<div class="step" id="st2"><span class="sn">2</span><div style="flex:1"><div class="sl">抽起始手牌・重抽・放置寶可夢・放置獎賞卡</div><div class="g c5">${SETUP.map(x=>`<button data-a="${x}">${x}</button>`).join("")}</div></div></div>
+<div class="step" id="st3"><span class="sn">3</span><button id="startB">▶ 對局開始</button></div></details>`+G.map(([h,c,a])=>`<div class="sec"><h3>${h}</h3><div class="g ${c}">${a.map(x=>`<button data-a="${x}">${x}</button>`).join("")}</div></div>`).join("");
+$("acts").onclick=e=>{if(e.target.id==="coinB")return coinFlip();if(e.target.id==="startB")return startGame();const a=e.target.dataset.a;if(a)act(a)};
+$("pMe").onclick=()=>{S.p="me";save();render()};$("pOp").onclick=()=>{S.p="op";save();render()};
+function nextTurn(){const pp=S.p;S.turn++;S.p=S.p==="me"?"op":"me";add("— 進入第 "+S.turn+" 回合（"+N[S.p]+"）—","sys",{turnUndo:1,prevP:pp})}
+$("next").onclick=nextTurn;
+$("first").onclick=()=>{S.first=S.first==="me"?"op":"me";if(S.turn===1)S.p=S.first;save();render()};
+document.querySelectorAll("[data-pz]").forEach(b=>b.onclick=()=>{const w=b.dataset.pz;S.pz[w]=Math.min(6,Math.max(0,S.pz[w]+ +b.dataset.d));save();render()});
+$("undo").onclick=()=>{const e=S.log.pop();if(e)rm(e);save();render()};
+$("log").onclick=ev=>{const id=ev.target.dataset.del;if(!id)return;const i=S.log.findIndex(e=>e.id==id);if(i>=0){rm(S.log[i]);S.log.splice(i,1)}save();render()};
+$("clr").onclick=()=>{if(confirm("確定清除全部紀錄？")){S.log=[];save();render()}};
+const txt=()=>S.log.map(line).join("\n");
+$("copy").onclick=()=>{const t=txt();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>alert("已複製"),()=>{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();alert("已複製")})};
+$("exp").onclick=()=>{const b=new Blob([txt()],{type:"text/plain"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="ptcg-log-"+new Date().toISOString().slice(0,16).replace(/[:T]/g,"")+".txt";a.click()};
+$("ntf").onsubmit=ev=>{ev.preventDefault();const v=$("nti").value.trim();$("nti").value="";if(v)add(v,S.p,{note:1})};
+
+const HK="ptcg-history-v1",DK="ptcg-decks-v1";let H=JSON.parse(localStorage.getItem(HK)||"[]"),DL=JSON.parse(localStorage.getItem(DK)||"[]");
+const saveH=()=>{localStorage.setItem(HK,JSON.stringify(H));localStorage.setItem(DK,JSON.stringify(DL))};
+const RN={W:"勝",L:"敗",D:"平"};
+function deckUI(){$("dl").innerHTML=DL.map(d=>`<option value="${esc(d)}">`).join("");$("myDeck").value=S.myDeck||"";$("opDeck").value=S.opDeck||""}
+["myDeck","opDeck"].forEach(k=>$(k).oninput=()=>{S[k]=$(k).value;save()});
+function modal(html){$("ovb").innerHTML=html;$("ov").classList.add("show")}function closeM(){$("ovb").classList.remove("wide");$("ov").classList.remove("show")}
+$("ov").onclick=e=>{if(e.target.id==="ov")closeM()};
+function endMatch(res){
+ if(S.ended&&!confirm("此對局已儲存過，要再存一筆嗎？"))return;
+ const md=(S.myDeck||"").trim(),od=(S.opDeck||"").trim();[md,od].forEach(d=>{if(d&&!DL.includes(d))DL.push(d)});
+ add("— 對局結束："+(res==="W"?"我方勝":res==="L"?"對手勝":"平手")+" —","sys");
+ H.unshift({id:Date.now()+""+Math.random().toString(36).slice(2,6),ts:Date.now(),result:res,first:S.first,coin:coinE(),started:started(),turns:S.turn,pz:{...S.pz},myDeck:md,opDeck:od,log:S.log.slice()});
+ S.ended=1;saveH();save();deckUI();if(SV)renderStats();
+ modal(`<h2>對局已儲存（${RN[res]}）</h2><p>要開始新對局嗎？（牌組名稱會保留）</p><div class="row"><button id="mNew" style="background:#10b981;color:#fff">開始新對局</button><button id="mNo" style="background:#e5e7eb">先不要</button></div>`);
+ $("mNew").onclick=()=>{closeM();newGame()};$("mNo").onclick=closeM}
+function newGame(){S={p:S.first,turn:1,first:S.first,pz:{me:6,op:6},log:[],id:1,myDeck:S.myDeck,opDeck:S.opDeck};add("新對局：準備階段","sys");SETUP_TOUCHED=0;render();deckUI()}
+$("newg").onclick=()=>{if(confirm("開始新對局？（清除紀錄、重置回合與獎賞卡）"))newGame()};
+$("endm").onclick=()=>{modal(`<h2>結束對局</h2><div class="row"><button data-r="W" class="W" style="color:#fff">我方勝</button><button data-r="L" class="L" style="color:#fff">對手勝</button><button data-r="D" class="D" style="color:#fff">平手</button></div><div class="row" style="margin-top:8px"><button id="mC" style="background:#e5e7eb">取消</button></div>`);
+ $("ovb").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{closeM();endMatch(b.dataset.r)});$("mC").onclick=closeM};
+const _act=act;act=function(a){if(a==="勝利"||a==="投降"){const w=a==="勝利"?S.p:(S.p==="me"?"op":"me");if(!confirm(`${N[S.p]}${a}，記錄為「${N[w]}勝」並結束對局？`))return;add(a,S.p);endMatch(w==="me"?"W":"L")}else _act(a)};
+function agg(list){const o={W:0,L:0,D:0,n:list.length};list.forEach(m=>o[m.result]++);o.rate=o.n?Math.round(o.W/o.n*1000)/10:0;return o}
+const pct=o=>o.n?o.rate+"%":"—";
+function byKey(k){const g={};H.forEach(m=>{const n=m[k]||"（未填）";(g[n]=g[n]||[]).push(m)});return Object.entries(g).map(([n,l])=>[n,agg(l)]).sort((a,b)=>b[1].n-a[1].n)}
+function tbl(t,rows){return `<h3>${t}</h3><table><tr><th>牌組</th><th>場</th><th>勝-敗-平</th><th>勝率</th></tr>${rows.map(([n,o])=>`<tr><td>${esc(n)}</td><td>${o.n}</td><td>${o.W}-${o.L}-${o.D}</td><td>${pct(o)}</td></tr>`).join("")||'<tr><td colspan=4>尚無資料</td></tr>'}</table>`}
+let SV=0;
+function renderStats(){const a=agg(H),f=agg(H.filter(m=>m.first==="me")),sd=agg(H.filter(m=>m.first==="op"));
+ $("stats").innerHTML=`<div class="row" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap"><h2 style="margin:0;flex:1">戰績</h2><button id="exJ" style="background:#e5e7eb">匯出 JSON</button><button id="exC" style="background:#e5e7eb">匯出 CSV</button><button id="imJ" style="background:#e5e7eb">匯入 JSON</button><button id="stc" style="background:#1f2937;color:#fff">返回對局</button></div>
+ <div class="cards"><div class="card"><div class="v">${a.n}</div><div class="l">總場數</div></div><div class="card"><div class="v">${a.W}-${a.L}-${a.D}</div><div class="l">勝-敗-平</div></div><div class="card"><div class="v">${pct(a)}</div><div class="l">總勝率</div></div><div class="card"><div class="v">${pct(f)}</div><div class="l">先攻勝率（${f.W}/${f.n}）</div></div><div class="card"><div class="v">${pct(sd)}</div><div class="l">後攻勝率（${sd.W}/${sd.n}）</div></div></div>
+ <div class="cols"><div>${tbl("依我方牌組",byKey("myDeck"))}</div><div>${tbl("依對手牌組",byKey("opDeck"))}</div><div><h3>對局紀錄</h3><ul class="ml">${H.map(m=>`<li data-m="${m.id}"><span class="r ${m.result}">${RN[m.result]}</span><span class="i">${new Date(m.ts).toLocaleString("zh-TW",{hour12:false})}<br>${esc(m.myDeck||"？")} vs ${esc(m.opDeck||"？")}・${m.first==="me"?"先攻":"後攻"}${m.coin?"（擲硬幣"+(m.coin.winner==="me"?"贏":"輸")+"）":""}・${m.turns} 回合・獎賞 ${m.pz.me}:${m.pz.op}</span><button data-dm="${m.id}">✕</button></li>`).join("")||"尚無對局"}</ul></div></div>`;
+ $("stc").onclick=toggleStats;$("exJ").onclick=()=>dl(JSON.stringify(H,null,1),"json","application/json");$("exC").onclick=()=>dl(csv(),"csv","text/csv");$("imJ").onclick=()=>$("imf").click()}
+$("stats").onclick=e=>{const d=e.target.dataset.dm;if(d){e.stopPropagation();if(confirm("確定刪除這場對局紀錄？")){H=H.filter(m=>m.id!=d);saveH();renderStats()}return}
+ const li=e.target.closest("[data-m]");if(li){const m=H.find(x=>x.id==li.dataset.m);modal(`<h2>${RN[m.result]}・${esc(m.myDeck||"？")} vs ${esc(m.opDeck||"？")}</h2><pre class="lg">${esc(m.log.map(line).join("\n"))}</pre><div class="row"><button id="mC" style="background:#e5e7eb">關閉</button></div>`);$("mC").onclick=closeM}};
+function toggleStats(){SV=!SV;$("stats").style.setProperty("--hh",document.querySelector("header").offsetHeight+"px");$("stats").classList.toggle("show",!!SV);$("stb").textContent=SV?"返回對局":"戰績";if(SV)renderStats()}
+$("stb").onclick=toggleStats;
+$("rulesB").onclick=()=>{RULES=!RULES;localStorage.setItem("ptcg-rules",RULES?"1":"0");render()};
+function dl(t,ext,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ext==="csv"?"\ufeff"+t:t],{type}));a.download="ptcg-history."+ext;a.click()}
+function csv(){const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';return [["日期時間","結果","先攻","回合數","我方剩餘獎賞","對手剩餘獎賞","我方牌組","對手牌組","紀錄筆數"].map(q).join(",")].concat(H.map(m=>[new Date(m.ts).toLocaleString("zh-TW",{hour12:false}),RN[m.result],N[m.first],m.turns,m.pz.me,m.pz.op,m.myDeck,m.opDeck,m.log.length].map(q).join(","))).join("\r\n")}
+$("imf").onchange=async()=>{const f=$("imf").files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d))throw 0;let n=0;d.forEach(m=>{if(m&&m.id&&["W","L","D"].includes(m.result)&&!H.some(x=>x.id==m.id)){m.log=m.log||[];m.pz=m.pz||{me:0,op:0};H.push(m);n++;[m.myDeck,m.opDeck].forEach(x=>{if(x&&!DL.includes(x))DL.push(x)})}});H.sort((a,b)=>b.ts-a.ts);saveH();deckUI();renderStats();alert("已匯入 "+n+" 場")}catch(e){alert("匯入失敗：檔案格式不正確")}$("imf").value=""};
+deckUI();
+
+$("setup").addEventListener("toggle",()=>{if(started())SETUP_TOUCHED=1});
+function startGame(){if(started()&&!confirm("對局已開始，要再記錄一次「對局開始」嗎？"))return;const pp=S.p;S.turn=1;S.p=S.first;add("— 對局開始：第 1 回合（先攻："+N[S.first]+"）—","sys",{start:1,prevP:pp})}
+function coinFlip(){let c={caller:S.p,guess:"",res:"",winner:"",choice:""};
+ const ch=(g,v,l)=>`<button type="button" class="chip" data-g="${g}" data-v="${v}">${l}</button>`;
+ modal(`<h2>🪙 擲硬幣決定先後攻</h2><label class="fl">猜的人</label><div class="fr">${ch("caller","me","我方")}${ch("caller","op","對手")}</div>
+ <label class="fl">猜</label><div class="fr">${ch("guess","正","正面")}${ch("guess","反","反面")}</div>
+ <label class="fl">結果</label><div class="fr">${ch("res","正","正面")}${ch("res","反","反面")}<button type="button" class="chip" id="rnd" style="background:#fde68a">🎲 隨機擲</button></div>
+ <label class="fl">贏家</label><div class="fr">${ch("winner","me","我方")}${ch("winner","op","對手")}</div>
+ <label class="fl">贏家選擇</label><div class="fr">${ch("choice","先攻","先攻")}${ch("choice","後攻","後攻")}</div>
+ <p id="cSum" style="font-size:18px;font-weight:700"></p>
+ <div class="row"><button id="cOk" style="background:#2563eb;color:#fff">記錄</button><button id="mC" style="background:#fee2e2">取消</button></div>`);
+ const box=$("ovb"),upd=()=>{
+  box.querySelectorAll("[data-g]").forEach(b=>b.classList.toggle("sel",c[b.dataset.g]===b.dataset.v));
+  const f=c.winner&&c.choice?(c.choice==="先攻"?c.winner:oth(c.winner)):"";$("cSum").textContent=f?"先攻："+N[f]:"（請選擇贏家與先後攻）";$("cOk").disabled=!f};
+ const auto=()=>{if(c.guess&&c.res)c.winner=c.guess===c.res?c.caller:oth(c.caller)};
+ box.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{c[b.dataset.g]=b.dataset.v;if(b.dataset.g!=="winner"&&b.dataset.g!=="choice")auto();upd()});
+ $("rnd").onclick=()=>{c.res=Math.random()<.5?"正":"反";auto();upd()};$("mC").onclick=closeM;
+ $("cOk").onclick=()=>{const f=c.choice==="先攻"?c.winner:oth(c.winner);const t="擲硬幣："+(c.guess?N[c.caller]+"猜"+c.guess+"，":"")+(c.res?"結果"+c.res+"，":"")+N[c.winner]+"贏，選擇"+c.choice+"（先攻："+N[f]+"）";
+  const pf=S.first;S.first=f;closeM();add(t,"sys",{coin:{...c,first:f,prevFirst:pf}})};upd()}
+render();
+</script></body></html>
